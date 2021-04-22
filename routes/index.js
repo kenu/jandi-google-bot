@@ -35,4 +35,16 @@ function send(res, data) {
   res.json(data);
 }
 
+const schedule = require('node-schedule');
+
+schedule.scheduleJob('0 0,8-23 * * *', async function () {
+  try {
+    const stats = await actions['cluster']();
+    await actions.sendToJandi(getData(stats));
+  } catch (e) {
+    console.log(e);
+  }
+  console.log('The answer to life, the universe, and everything!');
+});
+
 module.exports = router;
