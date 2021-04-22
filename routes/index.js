@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const express = require('express');
 const router = express.Router();
 const actions = require('../services/actions');
@@ -35,16 +36,20 @@ function send(res, data) {
   res.json(data);
 }
 
-const schedule = require('node-schedule');
+const JANDI_SCHEDULE = process.env.JANDI_SCHEDULE;
 
-schedule.scheduleJob('42 0,8-23 * * *', async function () {
-  try {
-    const stats = await actions['cluster']();
-    await actions.sendToJandi(getData(stats));
-  } catch (e) {
-    console.log(e);
-  }
-  console.log('The answer to life, the universe, and everything!');
-});
+if (JANDI_SCHEDULE) {
+  const schedule = require('node-schedule');
+  schedule.scheduleJob(JANDI_SCHEDULE, async function (fireTime) {
+    const datetime = dayjs(fireTime).format('MM/DD HH:mm');
+    try {
+      const stats = await actions['cluster']();
+      await actions.sendToJandi(getData(stats + '\n' + datetime));
+    } catch (e) {
+      console.log(e);
+    }
+    console.log(datetime, 'The answer to life, the universe, and everything!');
+  });
+}
 
 module.exports = router;
