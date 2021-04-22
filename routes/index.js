@@ -37,7 +37,7 @@ function send(res, data) {
 
 const schedule = require('node-schedule');
 
-schedule.scheduleJob('0 0,8-23 * * *', async function () {
+schedule.scheduleJob('42 0,8-23 * * *', async function () {
   try {
     const stats = await actions['cluster']();
     await actions.sendToJandi(getData(stats));
