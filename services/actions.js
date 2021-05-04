@@ -2,11 +2,13 @@ const sheetdb = require('../lib/sheetdb');
 const axios = require('axios');
 const NumberUtils = require('../common/NumberUtils');
 const ArrayUtils = require('../common/ArrayUtils');
+const stats = require('./stats');
 
 const actions = {
   'translate': function (key) {
     const map = {
       '클러스터': 'cluster',
+      '통계': 'stats',
       '로또': 'lotto',
       '시크릿': 'secret',
       '메뉴': 'menu',
@@ -23,6 +25,9 @@ const actions = {
       + '\n' + sheet.getCell(2, 1).value + ': ' + sheet.getCell(2, 2).value + '/' + sheet.getCell(2, 3).value
       + '\n' + sheet.getCell(3, 1).value + ': ' + sheet.getCell(3, 2).value + '/' + sheet.getCell(3, 3).value;
     return stats;
+  },
+  'stats': async () => {
+    return await stats.getStatsTotal();
   },
   'lotto': () => {
     if (Math.random() > .2) {
