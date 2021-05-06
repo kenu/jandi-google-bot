@@ -20,8 +20,13 @@ const actions = {
     const sheet = await sheetdb.getSheet(info);
     await sheet.loadCells('B2:D4');
     const sheetUrl = `https://docs.google.com/spreadsheets/d/${process.env.SHEET_ID}/edit#gid=${process.env.SHEET_GID}`;
-    const gaepoValue = sheet.getCell(2, 2).value + 118;
-    const seochoValue = sheet.getCell(3, 2).value + 128;
+    let gaepoValue = sheet.getCell(2, 2).value + 118;
+    let seochoValue = sheet.getCell(3, 2).value + 128;
+    gaepoValue = Math.max(gaepoValue, 0);
+    gaepoValue = Math.min(gaepoValue, 150);
+    seochoValue = Math.max(seochoValue, 0);
+    seochoValue = Math.min(seochoValue, 150);
+
     const stats =
       '[[현황 link]](' + sheetUrl + ')'
       + '\n' + sheet.getCell(2, 1).value + ': ' + gaepoValue + '/' + sheet.getCell(2, 3).value
