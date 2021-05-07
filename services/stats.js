@@ -22,21 +22,34 @@ const stats = {
     return await sheet.getRows();
   },
   getRegionStat: function (data) {
-    function getCount(data, region, action) {
+    function getCount(data, action) {
       return data.filter(item => {
-        return item[1] === region && item[2] === action;
+        return item[2] === action;
       });
     }
 
-    const gaepoIn = getCount(data, '개포', 'checkIn');
-    const gaepoOut = getCount(data, '개포', 'checkOut');
-    const gaepoForceOut = getCount(data, '개포', 'forceCheckOut');
-    const seochoIn = getCount(data, '서초', 'checkIn');
-    const seochoOut = getCount(data, '서초', 'checkOut');
-    const seochoForceOut = getCount(data, '서초', 'forceCheckOut');
+    function getFiltered(data, planetName) {
+      const planet = data.filter(item => item.includes(planetName));
+      function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+      }
+      const p = planet.map(item => item[3]);
+      const uniq = p.filter(onlyUnique);
+      return { planet, uniq };
+    }
+
+    const gaepo = getFiltered(data, '개포');
+    const seocho = getFiltered(data, '서초');
+
+    const gaepoIn = getCount(gaepo.planet, 'checkIn');
+    const gaepoOut = getCount(gaepo.planet, 'checkOut');
+    const gaepoForceOut = getCount(gaepo.planet, 'forceCheckOut');
+    const seochoIn = getCount(seocho.planet, 'checkIn');
+    const seochoOut = getCount(seocho.planet, 'checkOut');
+    const seochoForceOut = getCount(seocho.planet, 'forceCheckOut');
     return {
-      gaepo: { in: gaepoIn.length, out: gaepoOut.length + gaepoForceOut.length },
-      seocho: { in: seochoIn.length, out: seochoOut.length + seochoForceOut.length }
+      gaepo: { in: gaepoIn.length, out: gaepoOut.length + gaepoForceOut.length, uniq: gaepo.uniq.length },
+      seocho: { in: seochoIn.length, out: seochoOut.length + seochoForceOut.length, uniq: seocho.uniq.length }
     };
   },
   getStats: function (data) {
