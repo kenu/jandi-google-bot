@@ -1,5 +1,5 @@
 const sheetdb = require('../lib/sheetdb');
-const axios = require('axios');
+const got = require('got');
 const NumberUtils = require('../common/NumberUtils');
 const ArrayUtils = require('../common/ArrayUtils');
 const stats = require('./stats');
@@ -16,22 +16,12 @@ const actions = {
     return (map[key]) ? map[key] : key;
   },
   'cluster': async () => {
-    const info = { sheetId: process.env.SHEET_ID, id: process.env.SHEET_GID };
-    const sheet = await sheetdb.getSheet(info);
-    await sheet.loadCells('B2:D4');
-    const sheetUrl = `https://docs.google.com/spreadsheets/d/${process.env.SHEET_ID}/edit#gid=${process.env.SHEET_GID}`;
-    let gaepoValue = sheet.getCell(2, 2).value + 118;
-    let seochoValue = sheet.getCell(3, 2).value + 128;
-    gaepoValue = Math.max(gaepoValue, 0);
-    gaepoValue = Math.min(gaepoValue, 150);
-    seochoValue = Math.max(seochoValue, 0);
-    seochoValue = Math.min(seochoValue, 150);
-
-    const stats =
-      '[[현황 link]](' + sheetUrl + ')'
-      + '\n' + sheet.getCell(2, 1).value + ': ' + gaepoValue + '/' + sheet.getCell(2, 3).value
-      + '\n' + sheet.getCell(3, 1).value + ': ' + seochoValue + '/' + sheet.getCell(3, 3).value;
-    return stats;
+    const data = await stats.getStatus();
+    const stat =
+      '[[현황 link]](https://docs.google.com/spreadsheets/d/1uTqbUrHSiJghMijBqrcFG7FxkcdZTUYWhuD4s2jopT8/edit#gid=967932171)'
+      + '\n개포클러스터: ' + data[0] + ' / 150'
+      + '\n서초클러스터: ' + data[1] + ' / 150';
+    return stat;
   },
   'stats': async () => {
     return await stats.getStatsTotal();
@@ -55,13 +45,14 @@ const actions = {
     return menu.pop();
   },
   sendToJandi: async function (data) {
-    const config = {
+    const options = {
+      body: data,
       headers: {
         'Accept': 'application/vnd.tosslab.jandi-v2+json',
         'Content-Type': 'application/json'
       }
     }
-    return await axios.post(process.env.JANDI_INCOMING_WEBHOOK, data, config);
+    return await got.post(process.env.JANDI_INCOMING_WEBHOOK, options);
   }
 };
 
@@ -110,7 +101,7 @@ var words = [
   '42. 디버깅한번 으로 천버그 잡는다.\n-디버깅에서 잡히면 다행',
   '43. 돌(완벽한) 코드도 생각해보고 컴파일하자!\n-컴파일시 오류는 팀장도 못잡아',
   '44. 경영다툼에 개발자등 터진다.\n-경영이 뭐에요?',
-  '45. 제 코드가 석자\n-뭘 물어봐도 이미 머리속에서 내 코드 오류만 생각남',
+  '45. 제 코드가 석자\n-뭘 물어봐도 이미 머리 속에서 내 코드 오류만 생각남',
   '46. 버그보고 놀란가슴 오타보고 놀란다.\n-오타쳐놓고 버그인줄 알고 깜짝놀람',
   '47. 코딩 전 마음 다르고, 코딩 후 마음 다르다.\n-대단한 것 같아도 막상 짜놓고 보면 맘에 안들어.',
   '48. 제 코드 구린줄 모른다.\n-대단한 것 같아도 남이보면 그냥 구려.',

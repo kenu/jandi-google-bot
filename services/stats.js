@@ -1,7 +1,21 @@
+const got = require('got');
 const sheetdb = require('../lib/sheetdb');
 const DateUtils = require('../common/DateUtils');
 
 const stats = {
+  getStatus: async function () {
+    try {
+      const options = {
+        headers: { Cookie: process.env.CLUSTER_KEY }
+      };
+      const response = await got('https://cluster.42seoul.io/api/user/status', options);
+      const data = JSON.parse(response.body);
+      return [data.gaepo, data.seocho];
+    } catch (error) {
+      console.log(error.message);
+      return [-1, -1];
+    }
+  },
   getRows: async function () {
     const info = { sheetId: process.env.SHEET_ID, id: process.env.SHEET_GID_RAW };
     const sheet = await sheetdb.getSheet(info);
