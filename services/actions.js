@@ -44,15 +44,15 @@ const actions = {
     const menu = ArrayUtils.shuffle(menuList);
     return menu.pop();
   },
-  sendToJandi: async function (data) {
+  sendToJandi: async function (jsonData) {
     const options = {
-      json: data,
+      json: jsonData,
       headers: {
         'Accept': 'application/vnd.tosslab.jandi-v2+json',
         'Content-Type': 'application/json'
       }
     }
-    return await got.post(process.env.JANDI_INCOMING_WEBHOOK, options);
+    return await got.post(process.env.JANDI_INCOMING_WEBHOOK, { ...options });
   }
 };
 

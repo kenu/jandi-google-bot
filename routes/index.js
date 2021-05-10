@@ -25,8 +25,6 @@ router.post('/marvin', async (req, res, next) => {
 function getData(body) {
   return {
     'body': body,
-    "connectColor": "#FAC11B",
-    "connectInfo": []
   };
 }
 
@@ -46,7 +44,7 @@ if (JANDI_SCHEDULE) {
       const stats = await actions['cluster']();
       await actions.sendToJandi(getData(stats + '\n' + datetime));
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
     console.log(datetime, 'The answer to life, the universe, and everything!');
   });
