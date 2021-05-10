@@ -46,7 +46,7 @@ const actions = {
   },
   sendToJandi: async function (data) {
     const options = {
-      body: data,
+      json: data,
       headers: {
         'Accept': 'application/vnd.tosslab.jandi-v2+json',
         'Content-Type': 'application/json'
